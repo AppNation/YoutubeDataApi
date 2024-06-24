@@ -5,7 +5,6 @@ import 'package:html/parser.dart' as parser;
 import 'package:youtube_data_api/helpers/helpers_extention.dart';
 import 'package:youtube_data_api/models/channel.dart';
 import 'package:youtube_data_api/models/playlist.dart';
-import 'package:youtube_data_api/models/video_page.dart';
 import 'package:youtube_data_api/retry.dart';
 import 'package:collection/collection.dart';
 import 'package:xml2json/xml2json.dart';
@@ -13,7 +12,6 @@ import 'dart:convert';
 import 'helpers/extract_json.dart';
 import 'models/channel_data.dart';
 import 'models/video.dart';
-import 'models/video_data.dart';
 
 class YoutubeDataApi {
   ///Continue token for load more videos on youtube search
@@ -36,8 +34,7 @@ class YoutubeDataApi {
     ///Check if new search query is the same of last search query and continue token is not null
     ///for load more videos with the search query
     if (_searchToken != null && query == lastQuery) {
-      var url =
-          'https://www.youtube.com/youtubei/v1/search?key=$API_KEY';
+      var url = 'https://www.youtube.com/youtubei/v1/search?key=$API_KEY';
 
       return retry(() async {
         var body = {
@@ -284,7 +281,7 @@ class YoutubeDataApi {
         .map((e) => e.text)
         .toList(growable: false);
     var initialData =
-    scriptText.firstWhereOrNull((e) => e.contains('var ytInitialData = '));
+        scriptText.firstWhereOrNull((e) => e.contains('var ytInitialData = '));
     initialData ??= scriptText
         .firstWhereOrNull((e) => e.contains('window["ytInitialData"] ='));
     var jsonMap = extractJson(initialData!);
@@ -397,52 +394,51 @@ class YoutubeDataApi {
 
   ///Get video data (videoId, title, viewCount, username, likeCount, unlikeCount, channelThumb,
   /// channelId, subscribeCount ,Related videos)
-  Future<VideoData?> fetchVideoData(String videoId) async {
-    VideoData? videoData;
-    var client = http.Client();
-    var response =
-        await client.get(Uri.parse('https://www.youtube.com/watch?v=$videoId'));
-    var raw = response.body;
-    var root = parser.parse(raw);
-    final scriptText = root
-        .querySelectorAll('script')
-        .map((e) => e.text)
-        .toList(growable: false);
-    var initialData =
-        scriptText.firstWhereOrNull((e) => e.contains('var ytInitialData = '));
-    initialData ??= scriptText
-        .firstWhereOrNull((e) => e.contains('window["ytInitialData"] ='));
-    var jsonMap = extractJson(initialData!);
-    if (jsonMap != null) {
-      var contents = jsonMap.get('contents')?.get('twoColumnWatchNextResults');
+  // Future<VideoData?> fetchVideoData(String videoId) async {
+  //   VideoData? videoData;
+  //   var client = http.Client();
+  //   var response =
+  //       await client.get(Uri.parse('https://www.youtube.com/watch?v=$videoId'));
+  //   var raw = response.body;
+  //   var root = parser.parse(raw);
+  //   final scriptText = root
+  //       .querySelectorAll('script')
+  //       .map((e) => e.text)
+  //       .toList(growable: false);
+  //   var initialData =
+  //       scriptText.firstWhereOrNull((e) => e.contains('var ytInitialData = '));
+  //   initialData ??= scriptText
+  //       .firstWhereOrNull((e) => e.contains('window["ytInitialData"] ='));
+  //   var jsonMap = extractJson(initialData!);
+  //   if (jsonMap != null) {
+  //     var contents = jsonMap.get('contents')?.get('twoColumnWatchNextResults');
 
-      var contentList = contents
-          ?.get('secondaryResults')
-          ?.get('secondaryResults')
-          ?.getList('results')
-          ?.toList();
+  //     var contentList = contents
+  //         ?.get('secondaryResults')
+  //         ?.get('secondaryResults')
+  //         ?.getList('results')
+  //         ?.toList();
 
-      List<Video> videosList = [];
+  //     List<Video> videosList = [];
 
-      contentList?.forEach((element) {
-        if(element['compactVideoRenderer']?['title']?['simpleText'] !=null){
-          Video video = Video.fromMap(element);
-          videosList.add(video);
-        }
-      });
+  //     contentList?.forEach((element) {
+  //       if (element['compactVideoRenderer']?['title']?['simpleText'] != null) {
+  //         Video video = Video.fromMap(element);
+  //         videosList.add(video);
+  //       }
+  //     });
 
-      videoData = VideoData(
-          video: VideoPage.fromMap(contents, videoId), videosList: videosList);
-    }
-    return videoData;
-  }
+  //     videoData = VideoData(
+  //         video: VideoPage.fromMap(contents, videoId), videosList: videosList);
+  //   }
+  //   return videoData;
+  // }
 
   ///Load more videos in youtube channel
   Future<List<Video>> loadMoreInChannel(String API_KEY) async {
     List<Video> videos = [];
     var client = http.Client();
-    var url =
-        'https://www.youtube.com/youtubei/v1/browse?key=$API_KEY';
+    var url = 'https://www.youtube.com/youtubei/v1/browse?key=$API_KEY';
     var body = {
       'context': const {
         'client': {
@@ -475,8 +471,7 @@ class YoutubeDataApi {
   Future<List<Video>> loadMoreInPlayList(String API_KEY) async {
     List<Video> list = [];
     var client = http.Client();
-    var url =
-        'https://www.youtube.com/youtubei/v1/browse?key=$API_KEY';
+    var url = 'https://www.youtube.com/youtubei/v1/browse?key=$API_KEY';
     var body = {
       'context': const {
         'client': {
